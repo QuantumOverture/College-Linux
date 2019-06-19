@@ -2,4 +2,4 @@
 - https://www.w3schools.com/jsref/prop_html_innerhtml.asp [INNERHTML DOM]
 - https://www.w3schools.com/css/tryit.asp?filename=trycss_template4 [TEMPLATE]
 - https://www.w3schools.com/jsref/met_table_insertrow.asp [TABLE MANIPULATION]
-- Border-Collapse for tables(in order to remove their borders) post on GitHub [LOST LINK:(]
+- Border-Collapse for tables(in order to remove their borders) post on StackOverFlow [LOST LINK:(]

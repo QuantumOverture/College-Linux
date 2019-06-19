@@ -1,0 +1,43 @@
+* {
+  box-sizing: border-box;
+  outline: none !important;
+}
+
+
+
+body {
+  background-color: black;
+    overflow-x: auto;
+    overflow-y: scroll;
+ font-family: monospace;
+ 
+}
+
+#Control_Panel {
+  background-color: navy;
+  position: fixed;
+  width: 300px;
+  height: 100%;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  border: inset 2px blue;
+  text-align: center;
+  color:white;
+}
+
+#Kernal {
+  width: 100em;
+  background-color: black;
+  height: 100em;
+  z-index: 1;
+  margin-left: 300px;
+  padding-left: 20px;
+  color: white;
+    font-size: 20px;
+}
+
+#Kernal:focus {
+  outline: none !important;
+}
+

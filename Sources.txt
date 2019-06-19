@@ -1,1 +1,3 @@
-
+- https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_event_key_charcode [KEYPRESS AND CHARCODE]
+- https://www.w3schools.com/jsref/prop_html_innerhtml.asp [INNERHTML DOM]
+- https://www.w3schools.com/css/tryit.asp?filename=trycss_template4 [TEMPLATE]

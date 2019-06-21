@@ -9,3 +9,8 @@
 - https://www.w3schools.com/jsref/jsref_includes_array.asp [INCLUDES,ARRAY SEARCH COMMAND]
 - https://www.w3schools.com/js/js_comparisons.asp [COMPARISON OPERATORS]
 - https://www.geeksforgeeks.org/javascript-string-prototype-split-function/ [SPLIT STRING COMMAND]
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map [MAP]
+- https://stackoverflow.com/questions/586182/how-to-insert-an-item-into-an-array-at-a-specific-index-javascript [INDEXED INSERTION]
+- https://www.w3schools.com/jsref/met_table_deleterow.asp [ROW DELETION]
+- https://www.w3schools.com/jsref/coll_table_rows.asp [GET NUMBER OF ROWS]
+- https://www.w3schools.com/jsref/jsref_tostring_array.asp [STRING VERISON OF ARRAYS]

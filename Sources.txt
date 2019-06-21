@@ -5,3 +5,7 @@
 - Border-Collapse for tables(in order to remove their borders) post on StackOverFlow [LOST LINK:(]
 - https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus [FOCUS ON ITEMS]
 - https://stackoverflow.com/questions/20604299/what-is-innerhtml-on-input-elements [INPUT TAGS DON'T HAVE INNERHTML THEY HAVE VALUE]
+- https://www.w3schools.com/jsref/jsref_includes.asp [INCLUDES,STRING SEARCH COMMAND]
+- https://www.w3schools.com/jsref/jsref_includes_array.asp [INCLUDES,ARRAY SEARCH COMMAND]
+- https://www.w3schools.com/js/js_comparisons.asp [COMPARISON OPERATORS]
+- https://www.geeksforgeeks.org/javascript-string-prototype-split-function/ [SPLIT STRING COMMAND]

@@ -11,8 +11,9 @@ TO DO LIST:
 - implement correct error checking
 - correct ls --> shouldn't show | and should be in correct format
 - Piping and redirection
-
-
+- tab autocomplete
+- check wiki for final check
+- rm and rmdir are not realistic
 */
 
 
@@ -40,7 +41,7 @@ function CommandEnter(event){
  
  
         //  Add it on to the old command table at the end
-        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = CommandLineText;
+        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = ">User~:"+CommandLineText;
         //  Set Input line to empty
         document.getElementById("Command_Line").value="";
         
@@ -61,12 +62,14 @@ function TerminalOutput(command_arr){
        dir_hashtable.set(command_arr[1],["|"]);
         dir_hashtable.get(current_working_directory).splice(0,0,command_arr[1]);
     }else if(command_arr[0] == "cd"){
+        if(dir_hashtable.get(current_working_directory).includes(command_arr[1])){
         current_working_directory = command_arr[1];
+        }
     }else if(command_arr[0] == "pwd"){
         document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = current_working_directory;
     }else if(command_arr[0] == "ls"){
         // fix this
-        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML =  dir_hashtable.get(current_working_directory);
+        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML =  dir_hashtable.get(current_working_directory).toString();
     }else if(command_arr[0] == "clear"){
         var runs =document.getElementById("Old_Commands").rows.length;
         for(var i=0;i<runs;i++){
@@ -80,6 +83,24 @@ function TerminalOutput(command_arr){
         dir_hashtable.get(current_working_directory).splice(  dir_hashtable.get(current_working_directory).length,0,command_arr[1]);
         file_hashtable.set(command_arr[1],"EMPTY FILE\nVIM COPY HASN'T BEEN MADE YET");
     }else if(command_arr[0] == "rm"){
+      dir_hashtable.get(current_working_directory).splice(dir_hashtable.get(current_working_directory).indexOf(command_arr[1]),1);
+      file_hashtable.delete(command_arr[1]);
+    }else if(command_arr[0] == "rmdir"){
+        if(!dir_hashtable.get(current_working_directory).includes(command_arr[1])){
+            return;}
+       dir_hashtable.get(current_working_directory).splice(dir_hashtable.get(current_working_directory).indexOf(command_arr[1]),1);
+        for(var i=dir_hashtable.get(command_arr[1]).indexOf("|")+1;i<dir_hashtable.get(command_arr[1]).length;i++){
+            file_hashtable.delete(dir_hashtable.get(current_working_directory)[i]);
+        }
+        dir_hashtable.delete(command_arr[1]);
+    }else if(command_arr[0] == "mv"){
+        
+        
+    }else if(command_arr[0] == "head"){
+        
+    }else if(command_arr[0] == "tail"){
+        
+    }else if(command_arr[0] == "cp"){
         
     }
     

@@ -14,3 +14,5 @@
 - https://www.w3schools.com/jsref/met_table_deleterow.asp [ROW DELETION]
 - https://www.w3schools.com/jsref/coll_table_rows.asp [GET NUMBER OF ROWS]
 - https://www.w3schools.com/jsref/jsref_tostring_array.asp [STRING VERISON OF ARRAYS]
+- https://www.w3schools.com/jsref/jsref_indexof_array.asp [INDEXOF]
+- https://www.w3schools.com/jsref/jsref_splice.asp [INDEX BY INDEX DELETION]

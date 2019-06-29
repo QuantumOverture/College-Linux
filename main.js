@@ -11,11 +11,12 @@ Add to table command:
  document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = "UNSUPPORTED COMMAND!";
 
 
-
+MV:
+name change requries both args to be in the same directory
 
 TO DO LIST:(ERROR CHECKING AT EVERY STEP)
-Path Resolution ==> new path and file path AND TAB(for FILE PATHS) <----------------------------------------------
-Commands(all + flags)[FILE SYSTEM COMMANDS] ==> Make then their own functions and they return their output <_____|
+Path Resolution ==> new path and file path AND TAB(for FILE PATHS) <------------------------------------------------------------------------------------------
+Commands(all + flags)[FILE SYSTEM COMMANDS] -->make sure you handle new directory/file properly based on context of calling function ==> If it something like| rm or cat --> throw an error] ==> Make then their own functions and they return their output <--------------------------------------------------------------|
 Piping and redirection
 
 */
@@ -31,8 +32,11 @@ function CommandEnter(event){
         //  Get value of Input tag
         var CommandLineText = document.getElementById("Command_Line").value;
         
-        PathResolution("/root/test/cool/nice.txt");
-      
+    }else if(keyCode == 9){
+        // If Tab Key is pressed:
+        
+        
+        
     }
     
 }
@@ -67,42 +71,55 @@ FocusOnInput = function getFocus(){
 
 function IsInDirectory(Internal_Directory,Dir){
     //  Function: Simpilfies Directory Check
-    return dir_hashtable.get(Internal_Directory).slice(0,dir_hashtable.get(Internal_Directory).indexOf("|")).find(Dir);
+    return dir_hashtable.get(Internal_Directory).slice(0,dir_hashtable.get(Internal_Directory).indexOf("|")).indexOf(Dir);
 }
 
 function IsAInternalFile(Internal_Directory,Fil){
-        //  Function: Simpilfies File Check
-    return dir_hashtable.get(Internal_Directory).slice(dir_hashtable.get(Internal_Directory).indexOf("|"),dir_hashtable.get(Internal_Directory).length).find(Dir);
+    //  Function: Simpilfies File Check
+    return dir_hashtable.get(Internal_Directory).slice(dir_hashtable.get(Internal_Directory).indexOf("|"),dir_hashtable.get(Internal_Directory).length).indexOf(Fil);
 }
 
 
 function PathResolution(Path){
-    //  Function: More like a path checker -->as we have hashtables that give us direct access
+    //  Function: More like a path checker -->as we have hashtables that give us direct access[make sure you handle new directory/file properly based on context of calling function ==> If it something like rm or cat --> throw an error]
     var Internal_Directory = current_working_directory;
     var ResolvedPath = Path.split("/");
 
-    for(var i = 0; i < Path.length; i++){
+    for(var i = 0; i < ResolvedPath.length; i++){
+        if(ResolvedPath[i] == "" || ResolvedPath[i] == "root"){
+            continue;
+        }
+    
         // files (there and not) + directories (there and not)
-        if(IsInDirectory(Internal_Directory,Path[i]) != undefined){
-            //  Moves futhter in Path
-            Internal_Directory = Path[i];
-        }else if(IsInDirectory(Internal_Directory,Path[i]) == undefined && i == Path.length-1){
-            //  For commands like mkdir
-            return ["new directory",Path[i]];
-        }else if(IsAInternalFile(Internal_Directory,Path[i]) != undefined && i == Path.length-1){
-            //  For commands like rm and cat
-            return ["old file",Path[i],Internal_Directory];
-        }else if(IsAInternalFile(Internal_Directory,Path[i]) == undefined && i == Path.length-1){
-            //  For commands like touch
-            return ["new file",Path[i],Internal_Directory];
+        if(IsInDirectory(Internal_Directory,ResolvedPath[i]) != -1){
+            //  Moves further in ResolvedPath
+            Internal_Directory = ResolvedPath[i];
+        }else if(IsInDirectory(Internal_Directory,ResolvedPath[i]) == -1 && IsAInternalFile(Internal_Directory,ResolvedPath[i]) == -1){
+            //  For commands like mkdir and touch[functions that require NON-existing entites] but ALSO an error signal for commands like rm and cat[functions that require existing entites]
+            if(i == (ResolvedPath.length)-1){
+            return ["new directory/file",ResolvedPath[i],Internal_Directory];
+            }else{
+                alert(".:ERROR IN PATH:.");
+                return "ERROR";
+            }
+        }else if(IsAInternalFile(Internal_Directory,ResolvedPath[i]) != -1 ){
+            //  For commands like cat
+            if(i == (ResolvedPath.length)-1){
+                return ["old file",ResolvedPath[i],Internal_Directory];
+            }else{
+                alert(".:ERROR IN PATH:.");
+                return "ERROR";
+            }
+    
         }else{
             alert(".:ERROR IN PATH:.");
             return "ERROR";
         }
-                 
-        return ["old directory",Internal_Directory];
+              
+
         
     }
+            return ["old directory",Internal_Directory];
 }
 //======================================INTERNAL STUFF END================================================================
 

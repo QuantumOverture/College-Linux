@@ -3,7 +3,7 @@ dir_hashtable = new Map();
 dir_hashtable.set("/root",["|"]);
 current_working_directory = "/root";
 file_hashtable = new Map();
-
+info_hashtable = new Map(); //  For Date/time,permissions,etc.
 //=======================================
 /*
 
@@ -14,11 +14,11 @@ Add to table command:
 MV:
 name change requries both args to be in the same directory
 
-TO DO LIST:(ERROR CHECKING AT EVERY STEP)
-Path Resolution ==> new path and file path AND TAB(for FILE PATHS) <------------------------------------------------------------------------------------------
-Commands(all + flags)[FILE SYSTEM COMMANDS] -->make sure you handle new directory/file properly based on context of calling function ==> If it something like| rm or cat --> throw an error] ==> Make then their own functions and they return their output <--------------------------------------------------------------|
-Piping and redirection
+CHECK TASK LIST ON THE RIGHT -->
 
+Spaces not needed between > and < and >>
+
+tee command comment but not included
 */
 
 
@@ -31,15 +31,18 @@ function CommandEnter(event){
         
         //  Get value of Input tag
         var CommandLineText = document.getElementById("Command_Line").value;
-        
-    }else if(keyCode == 9){
-        // If Tab Key is pressed:
-        
+        var CommandArray = CommandLineText.split("|");
+        //  Output goes into other OR file not both
+        var Output = CommandResolution(CommandArray);
+        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = CommandLineText;
+        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = Output;
+        document.getElementById("Command_Line").value = "";
         
         
     }
-    
 }
+
+    
 //=======================================KEY PRESSES END================================================================
 
 
@@ -120,6 +123,71 @@ function PathResolution(Path){
         
     }
             return ["old directory",Internal_Directory];
+}
+
+
+function CommandResolution(CommandArray){
+    //  Function: Resolve given commands while keeping piping and file redirection in mind
+    //  WE get an array which has been broken down by | --> further break it down by command spaces
+    var InternalOutput = "";
+    
+    /*
+    * Implement the following functions:
+    *FileIn,FileOut,FileAppend
+    *All the commands
+    */
+    for(var i = 0; i < CommandArray.length; i++){
+        //  We are going through each pipped (or even a single command) command
+        if(CommandArray[i].indexOf("<") != -1){
+            // File Output   command | file if file doesn't exist make it unless it is append
+            var CurrCommand = CommandArray[i].split("<");
+            FileIn(CurrCommand);
+            InternalOutput = "";
+        }else if(CommandArray[i].indexOf(">") != -1 && (CommandArray[i].indexOf(">") == CommandArray[i].lastIndexOf(">"))){
+            //  For appending
+            // File Output   command | file if file doesn't exist make it unless it is append
+            var CurrCommand = CommandArray[i].split(">");
+            FileOut(CurrCommand);
+            InternalOutput = "";    
+        }else if(CommandArray[i].indexOf(">") != -1){
+            // File Output   command | file if file doesn't exist make it unless it is append
+            var CurrCommand = CommandArray[i].split(">>");
+            FileAppend(CurrCommand);
+            InternalOutput = "";
+        }else{
+            //  Command Resolution
+            var CurrCommand = CommandArray[i].split(" ");
+            
+            //  We put InternalOutput There Because of Piping related reasons(added parameter) --> We no output then return ""
+            //  Have internal checks for empty parameters for each command
+            switch(CurrCommand[0]){
+            case "mkidr": CurrCommand = mkdir(CurrCommand,InternalOutput); break;
+            case "rmdr": CurrCommand = rmdir(CurrCommand,InternalOutput); break;
+            case "rm": CurrCommand = rm(CurrCommand,InternalOutput); break;
+            case "touch": CurrCommand = touch(CurrCommand,InternalOutput); break;
+            case "cat": CurrCommand = cat(CurrCommand,InternalOutput); break;
+            case "ls": CurrCommand = ls(CurrCommand,InternalOutput); break;
+            case "echo": CurrCommand = echo(CurrCommand,InternalOutput); break;
+            case "cd": CurrCommand = cd(CurrCommand,InternalOutput); break;
+            case "cp": CurrCommand = cp(CurrCommand,InternalOutput); break;
+            case "mv": CurrCommand = mv(CurrCommand,InternalOutput); break;
+            case "head": CurrCommand = head(CurrCommand,InternalOutput); break;
+            case "pwd": CurrCommand = pwd(CurrCommand,InternalOutput); break;
+            case "tail": CurrCommand = tail(CurrCommand,InternalOutput); break;
+            case "chmod": CurrCommand = chmod(CurrCommand,InternalOutput); break;
+            default : CurrCommand = "UNSUPPORTED COMMAND";break; }
+
+            InternalOutput = CurrCommand;
+            if(CurrCommand == "UNSUPPORTED COMMAND"){ 
+                return InternalOutput;
+            }
+                
+           
+        }
+        
+    }
+    
+    return InternalOutput;
 }
 //======================================INTERNAL STUFF END================================================================
 

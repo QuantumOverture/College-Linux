@@ -17,3 +17,7 @@
 - https://www.w3schools.com/jsref/jsref_indexof_array.asp [INDEXOF]
 - https://www.w3schools.com/jsref/jsref_splice.asp [INDEX BY INDEX DELETION]
 - https://www.geeksforgeeks.org/absolute-relative-pathnames-unix/ [ABSOLUTE AND RELATIVE FILE PATHS]
+- https://ryanstutorials.net/linuxtutorial/piping.php [PIPPING AND REDIRECTION]
+- https://unix.stackexchange.com/questions/222333/behaviour-of-pipe-in-linux-with-output-redirection [PIPPING AND REDIRECTION BEHAVIOUR]
+- https://www.sitepoint.com/call-javascript-function-string-without-using-eval/ [SWITCH AND CASE IDEA]
+- https://www.w3schools.com/jsref/jsref_lastindexof.asp [Rindex equivalent in Javascript]

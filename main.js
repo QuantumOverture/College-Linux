@@ -138,23 +138,13 @@ function CommandResolution(CommandArray){
     */
     for(var i = 0; i < CommandArray.length; i++){
         //  We are going through each pipped (or even a single command) command
-        if(CommandArray[i].indexOf("<") != -1){
+        if(CommandArray[i].indexOf("<") != -1 && CommandArray[i].indexOf(">") != -1){
             // File Output   command | file if file doesn't exist make it unless it is append
+            //  For the redirections be aware there can be > < > inside
             var CurrCommand = CommandArray[i].split("<");
-            FileIn(CurrCommand);
+            FileInOutAppend(CurrCommand);
             InternalOutput = "";
-        }else if(CommandArray[i].indexOf(">") != -1 && (CommandArray[i].indexOf(">") == CommandArray[i].lastIndexOf(">"))){
-            //  For appending
-            // File Output   command | file if file doesn't exist make it unless it is append
-            var CurrCommand = CommandArray[i].split(">");
-            FileOut(CurrCommand);
-            InternalOutput = "";    
-        }else if(CommandArray[i].indexOf(">") != -1){
-            // File Output   command | file if file doesn't exist make it unless it is append
-            var CurrCommand = CommandArray[i].split(">>");
-            FileAppend(CurrCommand);
-            InternalOutput = "";
-        }else{
+        }}else{
             //  Command Resolution
             var CurrCommand = CommandArray[i].split(" ");
             

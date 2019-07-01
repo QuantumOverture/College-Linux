@@ -97,7 +97,7 @@ function PathResolution(Path){
         if(IsInDirectory(Internal_Directory,ResolvedPath[i]) != -1){
             //  Moves further in ResolvedPath
             Internal_Directory = ResolvedPath[i];
-        }else if(IsInDirectory(Internal_Directory,ResolvedPath[i]) == -1 && IsAInternalFile(Internal_Directory,ResolvedPath[i]) == -1){
+        }else if(IsInDirectory(Internal_Directory,ResolvedPath[i]) == -1 || IsAInternalFile(Internal_Directory,ResolvedPath[i]) == -1){
             //  For commands like mkdir and touch[functions that require NON-existing entites] but ALSO an error signal for commands like rm and cat[functions that require existing entites]
             if(i == (ResolvedPath.length)-1){
             return ["new directory/file",ResolvedPath[i],Internal_Directory];

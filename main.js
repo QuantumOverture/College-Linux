@@ -91,6 +91,7 @@ function PathResolution(Path){
    
     for(var i = 0; i < ResolvedPath.length; i++){
         if(ResolvedPath[i] == "" || ResolvedPath[i] == "root"){
+            Internal_Directory = "/root";
             continue;
         }
         
@@ -155,20 +156,18 @@ function CommandResolution(CommandArray){
             //  We put InternalOutput There Because of Piping related reasons(added parameter) --> We no output then return ""
             //  Have internal checks for empty parameters for each command
             switch(CurrCommand[0]){
-            case "mkdir": CurrCommand = mkdir(CurrCommand,InternalOutput); break;
-            case "rmdr": CurrCommand = rmdir(CurrCommand,InternalOutput); break;
+            /*[X}*/case "mkdir": CurrCommand = mkdir(CurrCommand,InternalOutput); break;
+            /*[X}*/case "rmdir": CurrCommand = rmdir(CurrCommand,InternalOutput); break;
             case "rm": CurrCommand = rm(CurrCommand,InternalOutput); break;
-            case "touch": CurrCommand = touch(CurrCommand,InternalOutput); break;
-            case "clear": CurrCommand = clear(CurrCommand,InternalOutput); break;        
-            case "cat": CurrCommand = cat(CurrCommand,InternalOutput); break;
-            case "ls": CurrCommand = ls(CurrCommand,InternalOutput); break;
-            case "echo": CurrCommand = echo(CurrCommand,InternalOutput); break;
-            case "cd": CurrCommand = cd(CurrCommand,InternalOutput); break;
+            /*[X}*/case "touch": CurrCommand = touch(CurrCommand,InternalOutput); break;
+            /*[X}*/case "clear": CurrCommand = clear(CurrCommand,InternalOutput); break;        
+            /*[X}*/case "cat": CurrCommand = cat(CurrCommand,InternalOutput); break;
+            /*[X}*/case "ls": CurrCommand = ls(CurrCommand,InternalOutput); break;
+            /*[X}*/case "echo": CurrCommand = echo(CurrCommand,InternalOutput); break;
+            /*[X}*/case "cd": CurrCommand = cd(CurrCommand,InternalOutput); break;
             case "cp": CurrCommand = cp(CurrCommand,InternalOutput); break;
             case "mv": CurrCommand = mv(CurrCommand,InternalOutput); break;
-            case "head": CurrCommand = head(CurrCommand,InternalOutput); break;
-            case "pwd": CurrCommand = pwd(CurrCommand,InternalOutput); break;
-            case "tail": CurrCommand = tail(CurrCommand,InternalOutput); break;
+            /*[X}*/case "pwd": CurrCommand = pwd(CurrCommand,InternalOutput); break;
             default : CurrCommand = "UNSUPPORTED COMMAND";break; }
 
             InternalOutput = CurrCommand;
@@ -204,7 +203,7 @@ function mkdir(CurrCommand,InternalOutput){
     }
   
     if(GivenPath == "Error" || GivenPath[0] != "new directory/file"){
-        return "Error";
+        return "mkdir Error";
     }
     
     //  Intialize new directory
@@ -229,12 +228,16 @@ function cd(CurrCommand,InternalOutput){
     }else{
         GivenPath = PathResolution(CurrCommand[1]);
     }
-    alert(GivenPath);
-    if(GivenPath == "Error" || GivenPath[0] != "old directory"){
-        return "Error";
-    }
 
+    if(GivenPath == "Error" || GivenPath[0] != "old directory"){
+        return "Cd Error";
+    }
+    
     current_working_directory = GivenPath[1];
+    if(current_working_directory == "NULL"){
+        current_working_directory = "/root";
+    }
+    
     
     return "";
 }
@@ -242,5 +245,84 @@ function cd(CurrCommand,InternalOutput){
 function pwd(CurrCommand,InternalOutput){
     return current_working_directory;
 }
+
+
+function echo(CurrCommand,InternalOutput){
+
+    if( CurrCommand.length <2){
+        GivenString = InternalOutput.join(" ");  
+    }else{
+        GivenString = CurrCommand.slice(1).join(" ");
+    }
+    return GivenString;
+}
+
+
+function clear(CurrCommand,InternalOutput){
+    NumRows = document.getElementById('Old_Commands').rows.length;
+
+    for(var i = 0; i < NumRows; i++){
+        document.getElementById('Old_Commands').deleteRow(-1);
+    }
+    return "";   
+}
+
+function rmdir(CurrCommand,InternalOutput){
+    if( CurrCommand.length <2){
+        GivenPath = PathResolution(InternalOutput);  
+    }else{
+        GivenPath = PathResolution(CurrCommand[1]);
+    }    
+    if(GivenPath == "Error" || GivenPath[0] != "old directory"){
+        return "rmdir Error";
+    }
+    
+    if(dir_hashtable.get(GivenPath[1]).length == 2){
+        //  Removing Child directory access from parent
+        dir_hashtable.get(dir_hashtable.get(GivenPath[1])[0]).splice(dir_hashtable.get(dir_hashtable.get(GivenPath[1])[0]).indexOf(GivenPath[1]),1);
+        dir_hashtable.delete(GivenPath[1]);
+        
+    }else{
+        return "Directory not empty"; 
+    }    
+
+    
+    return "";
+}
+
+
+function touch(CurrCommand,InternalOutput){
+    if( CurrCommand.length <2){
+        GivenPath = PathResolution(InternalOutput);  
+    }else{
+        GivenPath = PathResolution(CurrCommand[1]);
+    }    
+    if(GivenPath == "Error" || GivenPath[0] != "new directory/file"){
+        return "Touch Error";
+    }
+
+    
+    dir_hashtable.get(GivenPath[2]).splice((dir_hashtable.get(GivenPath[2])).indexOf("|")+1,0,GivenPath[1]);
+    file_hashtable.set(GivenPath[1],"FILE CONTENTS OF "+GivenPath[1]);
+    
+    return "";
+}
+
+function cat(CurrCommand,InternalOutput){
+    if( CurrCommand.length <2){
+        GivenPath = PathResolution(InternalOutput);  
+    }else{
+        GivenPath = PathResolution(CurrCommand[1]);
+    }    
+    if(GivenPath == "Error" || GivenPath[0] != "old file"){
+        return "Cat Error";
+    }
+    
+    //  ["old file",ResolvedPath[i],Internal_Directory];
+    return  file_hashtable.get(GivenPath[1]); 
+    
+}
+
+
 //======================================COMMANDS END===============================================================
 

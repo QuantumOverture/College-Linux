@@ -33,7 +33,7 @@ function CommandEnter(event){
         var CommandArray = CommandLineText.split("|");
         //  Output goes into other OR file not both
         var Output = CommandResolution(CommandArray);
-        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = CommandLineText;
+        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = "User~:" + CommandLineText;
         document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = Output;
         document.getElementById("Command_Line").value = "";
         
@@ -88,16 +88,20 @@ function PathResolution(Path){
     //  Function: More like a path checker -->as we have hashtables that give us direct access[make sure you handle new directory/file properly based on context of calling function ==> If it something like rm or cat --> throw an error]
     var Internal_Directory = current_working_directory;
     var ResolvedPath = Path.split("/");
-
+   
     for(var i = 0; i < ResolvedPath.length; i++){
         if(ResolvedPath[i] == "" || ResolvedPath[i] == "root"){
             continue;
         }
-    
+        
         // files (there and not) + directories (there and not)
         if(IsInDirectory(Internal_Directory,ResolvedPath[i]) != -1){
             //  Moves further in ResolvedPath
             Internal_Directory = ResolvedPath[i];
+        }else if(ResolvedPath[i] == ".."){
+            Internal_Directory = dir_hashtable.get(Internal_Directory)[0];
+        }else if(ResolvedPath[i] == "."){
+            //  Do nothing lol
         }else if(IsInDirectory(Internal_Directory,ResolvedPath[i]) == -1 && IsAInternalFile(Internal_Directory,ResolvedPath[i]) == -1){
             //  For commands like mkdir and touch[functions that require NON-existing entites] but ALSO an error signal for commands like rm and cat[functions that require existing entites]
             if(i == (ResolvedPath.length)-1){
@@ -216,8 +220,27 @@ function mkdir(CurrCommand,InternalOutput){
 function ls(CurrCommand,InternalOutput){
     //  Conditional here to hide .. for cd ..s
     return dir_hashtable.get(current_working_directory).slice(1);
-   
 }
 
+function cd(CurrCommand,InternalOutput){
+    
+    if( CurrCommand.length <2){
+        GivenPath = PathResolution(InternalOutput);  
+    }else{
+        GivenPath = PathResolution(CurrCommand[1]);
+    }
+    alert(GivenPath);
+    if(GivenPath == "Error" || GivenPath[0] != "old directory"){
+        return "Error";
+    }
+
+    current_working_directory = GivenPath[1];
+    
+    return "";
+}
+
+function pwd(CurrCommand,InternalOutput){
+    return current_working_directory;
+}
 //======================================COMMANDS END===============================================================
 

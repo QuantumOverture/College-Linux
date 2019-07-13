@@ -1,9 +1,9 @@
 // === CORE ==============================
 dir_hashtable = new Map();
-dir_hashtable.set("/root",["|"]);
+dir_hashtable.set("/root",["NULL","|"]);
 current_working_directory = "/root";
 file_hashtable = new Map();
-info_hashtable = new Map(); //  For Date/time,permissions,etc.
+
 //=======================================
 /*
 
@@ -28,7 +28,6 @@ function CommandEnter(event){
    var keyCode = event.charCode;
     if(keyCode == 13){
         // If Enter Key is pressed:
-        
         //  Get value of Input tag
         var CommandLineText = document.getElementById("Command_Line").value;
         var CommandArray = CommandLineText.split("|");
@@ -70,6 +69,8 @@ FocusOnInput = function getFocus(){
 
 
 
+
+
 //======================================INTERNAL STUFF===================================================================
 
 function IsInDirectory(Internal_Directory,Dir){
@@ -97,7 +98,7 @@ function PathResolution(Path){
         if(IsInDirectory(Internal_Directory,ResolvedPath[i]) != -1){
             //  Moves further in ResolvedPath
             Internal_Directory = ResolvedPath[i];
-        }else if(IsInDirectory(Internal_Directory,ResolvedPath[i]) == -1 || IsAInternalFile(Internal_Directory,ResolvedPath[i]) == -1){
+        }else if(IsInDirectory(Internal_Directory,ResolvedPath[i]) == -1 && IsAInternalFile(Internal_Directory,ResolvedPath[i]) == -1){
             //  For commands like mkdir and touch[functions that require NON-existing entites] but ALSO an error signal for commands like rm and cat[functions that require existing entites]
             if(i == (ResolvedPath.length)-1){
             return ["new directory/file",ResolvedPath[i],Internal_Directory];
@@ -138,23 +139,23 @@ function CommandResolution(CommandArray){
     */
     for(var i = 0; i < CommandArray.length; i++){
         //  We are going through each pipped (or even a single command) command
-        if(CommandArray[i].indexOf("<") != -1 && CommandArray[i].indexOf(">") != -1){
+        if(CommandArray[i].indexOf("<") != -1 || CommandArray[i].indexOf(">") != -1){
             // File Output   command | file if file doesn't exist make it unless it is append
             //  For the redirections be aware there can be > < > inside
             var CurrCommand = CommandArray[i].split("<");
             FileInOutAppend(CurrCommand);
             InternalOutput = "";
-        }}else{
+        }else{
             //  Command Resolution
             var CurrCommand = CommandArray[i].split(" ");
-            
             //  We put InternalOutput There Because of Piping related reasons(added parameter) --> We no output then return ""
             //  Have internal checks for empty parameters for each command
             switch(CurrCommand[0]){
-            case "mkidr": CurrCommand = mkdir(CurrCommand,InternalOutput); break;
+            case "mkdir": CurrCommand = mkdir(CurrCommand,InternalOutput); break;
             case "rmdr": CurrCommand = rmdir(CurrCommand,InternalOutput); break;
             case "rm": CurrCommand = rm(CurrCommand,InternalOutput); break;
             case "touch": CurrCommand = touch(CurrCommand,InternalOutput); break;
+            case "clear": CurrCommand = clear(CurrCommand,InternalOutput); break;        
             case "cat": CurrCommand = cat(CurrCommand,InternalOutput); break;
             case "ls": CurrCommand = ls(CurrCommand,InternalOutput); break;
             case "echo": CurrCommand = echo(CurrCommand,InternalOutput); break;
@@ -164,7 +165,6 @@ function CommandResolution(CommandArray){
             case "head": CurrCommand = head(CurrCommand,InternalOutput); break;
             case "pwd": CurrCommand = pwd(CurrCommand,InternalOutput); break;
             case "tail": CurrCommand = tail(CurrCommand,InternalOutput); break;
-            case "chmod": CurrCommand = chmod(CurrCommand,InternalOutput); break;
             default : CurrCommand = "UNSUPPORTED COMMAND";break; }
 
             InternalOutput = CurrCommand;
@@ -179,6 +179,7 @@ function CommandResolution(CommandArray){
     
     return InternalOutput;
 }
+
 //======================================INTERNAL STUFF END================================================================
 
 
@@ -190,6 +191,33 @@ function CommandResolution(CommandArray){
 
 //======================================COMMANDS===================================================================
 
+function mkdir(CurrCommand,InternalOutput){
+    //  Resolve path piping and regular
+    if( CurrCommand.length <2){
+        GivenPath = PathResolution(InternalOutput);  
+    }else{
+        GivenPath = PathResolution(CurrCommand[1]);
+    }
+  
+    if(GivenPath == "Error" || GivenPath[0] != "new directory/file"){
+        return "Error";
+    }
+    
+    //  Intialize new directory
+    dir_hashtable.set(GivenPath[1],["|"]);
+    (dir_hashtable.get(GivenPath[1])).splice(0,0,GivenPath[2]);
+    
+    //  Add to new directory to start
+    (dir_hashtable.get(GivenPath[2])).splice((dir_hashtable.get(GivenPath[2])).indexOf("|"),0,GivenPath[1]);
+    return "";
+}
+
+
+function ls(CurrCommand,InternalOutput){
+    //  Conditional here to hide .. for cd ..s
+    return dir_hashtable.get(current_working_directory).slice(1);
+   
+}
 
 //======================================COMMANDS END===============================================================
 

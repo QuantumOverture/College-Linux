@@ -158,14 +158,14 @@ function CommandResolution(CommandArray){
             switch(CurrCommand[0]){
             /*[X}*/case "mkdir": CurrCommand = mkdir(CurrCommand,InternalOutput); break;
             /*[X}*/case "rmdir": CurrCommand = rmdir(CurrCommand,InternalOutput); break;
-            case "rm": CurrCommand = rm(CurrCommand,InternalOutput); break;
+            /*[X}*/case "rm": CurrCommand = rm(CurrCommand,InternalOutput); break;
             /*[X}*/case "touch": CurrCommand = touch(CurrCommand,InternalOutput); break;
             /*[X}*/case "clear": CurrCommand = clear(CurrCommand,InternalOutput); break;        
             /*[X}*/case "cat": CurrCommand = cat(CurrCommand,InternalOutput); break;
             /*[X}*/case "ls": CurrCommand = ls(CurrCommand,InternalOutput); break;
             /*[X}*/case "echo": CurrCommand = echo(CurrCommand,InternalOutput); break;
             /*[X}*/case "cd": CurrCommand = cd(CurrCommand,InternalOutput); break;
-            case "cp": CurrCommand = cp(CurrCommand,InternalOutput); break;
+            /*[X}*/case "cp": CurrCommand = cp(CurrCommand,InternalOutput); break;
             case "mv": CurrCommand = mv(CurrCommand,InternalOutput); break;
             /*[X}*/case "pwd": CurrCommand = pwd(CurrCommand,InternalOutput); break;
             default : CurrCommand = "UNSUPPORTED COMMAND";break; }
@@ -300,10 +300,10 @@ function touch(CurrCommand,InternalOutput){
     if(GivenPath == "Error" || GivenPath[0] != "new directory/file"){
         return "Touch Error";
     }
-
     
     dir_hashtable.get(GivenPath[2]).splice((dir_hashtable.get(GivenPath[2])).indexOf("|")+1,0,GivenPath[1]);
-    file_hashtable.set(GivenPath[1],"FILE CONTENTS OF "+GivenPath[1]);
+    //  Also hold which directory it is in order to remove collisions
+    file_hashtable.set(GivenPath[1]+" "+GivenPath[2],"FILE CONTENTS OF "+GivenPath[1]);
     
     return "";
 }
@@ -319,10 +319,43 @@ function cat(CurrCommand,InternalOutput){
     }
     
     //  ["old file",ResolvedPath[i],Internal_Directory];
-    return  file_hashtable.get(GivenPath[1]); 
+    return  file_hashtable.get(GivenPath[1]+" "+GivenPath[2]); 
     
 }
 
+function cp(CurrCommand,InternalOutput){
+    //  Only old file to new file copy supported [keeping the name same and different also supported]
+    if( CurrCommand.length <2){
+        InternalOutput = InternalOutput.split(" ");
+        Source = PathResolution(InternalOutput[0]);
+        Destination = PathResolution(InternalOutput[1]);
+    }else{
+        Source = PathResolution(CurrCommand[1]);
+        Destination = PathResolution(CurrCommand[2]);
+    }    
+    if(Source == "Error" || Destination == "Error" || Source[0]!="old file" || Destination[0]=="old file" ){
+        return "Cp Error";
+    }
+    //  Intialize file
+    if(Destination[0] == "old directory"){
+        // Same name copy
+      
+        file_hashtable.set(Source[1]+" "+Destination[1],file_hashtable.get(Source[1]+" "+Source[2]));
+        dir_hashtable.get(Destination[1]).push(Source[1]);
+    }else{
+        //  Different name copy
+        file_hashtable.set(Destination[1]+" "+Destination[2],file_hashtable.get(Source[1]+" "+Source[2]));
+        // Add file to directory
+        dir_hashtable.get(Destination[2]).push(Destination[1]);
+    }
+    return "";
+}
 
+
+function rm(CurrCommand,InternalOutput){
+    //  Name of file +" " + Name of directory that holds said file --> also fix |
+    
+    
+}
 //======================================COMMANDS END===============================================================
 

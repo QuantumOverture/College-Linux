@@ -352,10 +352,64 @@ function cp(CurrCommand,InternalOutput){
 }
 
 
+function rmRecursiveDeletion(Directory){
+    
+    if(dir_hashtable.get(Directory).length == 2 ){
+        dir_hashtable.delete(Directory);
+        return "";
+    }
+    
+    for(var i = 0; i < dir_hashtable.get(Directory).indexOf("|"); i++){
+        rmRecursiveDeletion((dir_hashtable.get(Directory))[i]);
+    }
+    
+    for(i = dir_hashtable.get(Directory).indexOf("|") + 1; i < dir_hashtable.get(Directory).length; i++){
+        file_hashtable.delete((dir_hashtable.get(Directory))[i]);
+      
+    }
+    
+    
+   for(var j = dir_hashtable.get(Directory).length-1;j>=0;j--){
+       
+       if(dir_hashtable.get(Directory)[j] == "|"){
+           continue;
+       }
+       
+       dir_hashtable.get(Directory).pop();
+       
+   }
+        
+        
+    dir_hashtable.delete(Directory);
+    return "";
+}
+
 function rm(CurrCommand,InternalOutput){
     //  Name of file +" " + Name of directory that holds said file --> also fix |
-    
-    
+    if(CurrCommand.indexOf("-r")!=-1){
+        // recursive directory deletion
+        CurrCommand = CurrCommand.splice(CurrCommand.indexOf("-r"),1);
+        
+        if( CurrCommand.length <2){
+            GivenPath = PathResolution(InternalOutput);  
+        }else{
+            GivenPath = PathResolution(CurrCommand[1]);
+        }    
+        if(GivenPath == "Error" || GivenPath[0] != "old directory"){
+            return "rmdir Error";
+        }
+        
+
+        rmRecursiveDeletion(GivenPath[1]);
+        
+    }else if(CurrCommand.indexOf("-d")!=-1){
+        //  mkdir
+        CurrCommand = CurrCommand.splice(CurrCommand.indexOf("-d"),1);
+        mkdir(CurrCommand,InternalOutput);
+    }else{
+        // file removal
+        
+    }
 }
 //======================================COMMANDS END===============================================================
 

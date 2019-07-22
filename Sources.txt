@@ -22,3 +22,10 @@
 - https://www.sitepoint.com/call-javascript-function-string-without-using-eval/ [SWITCH AND CASE IDEA]
 - https://www.w3schools.com/jsref/jsref_lastindexof.asp [Rindex equivalent in Javascript]
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
+- https://www.w3schools.com/jsref/jsref_replace.asp
+- https://www.geeksforgeeks.org/javascript-array-join-method/
+- https://www.geeksforgeeks.org/cp-command-linux-examples/
+- https://love2dev.com/blog/javascript-remove-from-array/
+- https://stackoverflow.com/questions/5767325/how-do-i-remove-a-particular-element-from-an-array-in-javascript
+- https://superuser.com/questions/189362/how-to-pipe-command-output-to-other-commands
+- https://stackoverflow.com/questions/35116699/piping-not-working-with-echo-command

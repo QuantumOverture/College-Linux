@@ -34,7 +34,13 @@ function CommandEnter(event){
         //  Output goes into other OR file not both
         document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = "User~:" + CommandLineText;
         var Output = CommandResolution(CommandArray);
-        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = Output;
+        Output = Output.replace("\\t","                ");
+        Output = Output.split("\n");
+        //  for \n to show up properly
+        for(var x=0;x<Output.length;x++){
+        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = Output[x];
+        }
+        
         document.getElementById("Command_Line").value = "";
         
         

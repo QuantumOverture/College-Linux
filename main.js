@@ -34,12 +34,17 @@ function CommandEnter(event){
         //  Output goes into other OR file not both
         document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = "User~:" + CommandLineText;
         var Output = CommandResolution(CommandArray);
-        Output = Output.replace("\\t","                ");
-        Output = Output.split("\n");
-        //  for \n to show up properly
-        for(var x=0;x<Output.length;x++){
-        document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = Output[x];
+        //Output = Output.replace("\\t","                ");
+        if(Output.indexOf("\n")!=-1){
+            Output = Output.split("\n");
+            for(var x=0;x<Output.length;x++){
+                document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = Output[x];
+            }
+
+        }else{
+            document.getElementById("Old_Commands").insertRow(-1).insertCell(-1).innerHTML = Output;
         }
+     
         
         document.getElementById("Command_Line").value = "";
         
@@ -531,186 +536,51 @@ function echo(CurrCommand,InternalOutput, Overloaded){
 
 //======================================FILE MANIPULATION===========================================================
 
+function DelimitFileOperators(CommandArray){
+    
+    if( (CommandArray[0] == ">" && CommandArray[1] == ">") || (CommandArray[CommandArray.length-2] == ">" && CommandArray[CommandArray.length-1] == ">")){
+        return "ERROR in DelimitFileOperators"
+    }if((CommandArray[0] == ">") || (CommandArray[CommandArray.length-1] == ">")){
+        return "ERROR in DelimitFileOperators"
+    }if((CommandArray[0] == "<") || (CommandArray[CommandArray.length-1] == "<")){
+        return "ERROR in DelimitFileOperators"
+    }  
+    
+    
+    var Signs = [];
+    for(var i = 1; i < CommandArray.length-1; i++){
+        if(CommandArray[i] == ">" && CommandArray[i+1] == ">"){
+            Signs.push(">>");
+        }else if(CommandArray[i] == ">" && CommandArray[i-1] != ">" && CommandArray[i+1] != ">"){
+            Signs.push(">");
+        }else if(CommandArray[i] == "<"){
+            Signs.push("<");
+        }    
+    }
+
+    
+    
+    
+    
+    CommandArray = CommandArray.replace(/>>/g,";");
+    CommandArray = CommandArray.replace(/>/g,";");
+    CommandArray = CommandArray.replace(/</g,";");
+    
+    CommandArray = CommandArray.split(";");
+    for(var i = 0; i < CommandArray.length; i++){
+        CommandArray[i] = CommandArray[i].trim();    
+    }
+    
+    return [CommandArray,Signs];
+}
+
 
 
 function FileInOutAppend(CommandArray,InternalOutput){
-
-//  new file creation case 
-    
-    if(CommandArray.indexOf(">>") != -1){
-        
-        
-        var CurrCommand = CommandArray.substr(0,CommandArray.indexOf(">>")).split(" ");
-
-        while(CurrCommand[0] == ""){
-            CurrCommand.splice(0,1);
-        }
-
-        while(CurrCommand[CurrCommand.length-1] == " "){
-            CurrCommand.splice(CurrCommand.length-1,1);
-        }
-
-
-        //  We put InternalOutput There Because of Piping related reasons(added parameter) --> We no output then return ""
-        //  Have internal checks for empty parameters for each command
-        switch(CurrCommand[0]){
-                /*[X}*/case "mkdir": CurrCommand = mkdir(CurrCommand,InternalOutput); break;
-                /*[X}*/case "rmdir": CurrCommand = rmdir(CurrCommand,InternalOutput); break;
-                /*[X}*/case "rm": CurrCommand = rm(CurrCommand,InternalOutput); break;
-                /*[X}*/case "touch": CurrCommand = touch(CurrCommand,InternalOutput); break;
-                /*[X}*/case "clear": CurrCommand = clear(CurrCommand,InternalOutput); break;        
-                /*[X}*/case "cat": CurrCommand = cat(CurrCommand,InternalOutput); break;
-                /*[X}*/case "ls": CurrCommand = ls(CurrCommand,InternalOutput); break;
-                /*[X}*/case "echo": CurrCommand = echo(CurrCommand,InternalOutput,"OVERLOAD_4_REDIRECTION"); break;
-                /*[X}*/case "cd": CurrCommand = cd(CurrCommand,InternalOutput); break;
-                /*[X}*/case "cp": CurrCommand = cp(CurrCommand,InternalOutput); break;
-                /*[X}*/case "mv": CurrCommand = mv(CurrCommand,InternalOutput); break;
-                /*[X}*/case "pwd": CurrCommand = pwd(CurrCommand,InternalOutput); break;
-            default : return "UNSUPPORTED COMMAND";break; }
-
-        TestPath = CommandArray.substr(CommandArray.indexOf(">>")+2,CommandArray.length);
-        
-        while(TestPath[0] == " "){
-            TestPath = TestPath.substr(1,TestPath.length);
-        }
-        
-        while(TestPath[TestPath.length-1] == " "){
-            TestPath = TestPath.substr(0,TestPath.length-1);
-        }
-        
-        TestPath = PathResolution(TestPath);
-        
-        if(TestPath == "Error"){
-            return "Redirection Error";
-        }else if(TestPath[0] == "new directory/file"){
-            file_hashtable.set(TestPath[1]+" "+TestPath[2],"");
-            dir_hashtable.get(TestPath[2]).splice(dir_hashtable.get(TestPath[2]).indexOf("|")+1,0,TestPath[1]);
-        }else if(TestPath[0] != "old file"){
-            return "Redirection Error";
-        }
-        
-        file_hashtable.set(TestPath[1]+" "+TestPath[2],file_hashtable.get(TestPath[1]+" "+TestPath[2])+"\n"+CurrCommand);
-        
-        return "";
-        
-    }else if(CommandArray.indexOf(">") != -1){
-    
-
-        var CurrCommand = CommandArray.substr(0,CommandArray.indexOf(">")).split(" ");
-
-        while(CurrCommand[0] == ""){
-            CurrCommand.splice(0,1);
-        }
-
-        while(CurrCommand[CurrCommand.length-1] == " "){
-            CurrCommand.splice(CurrCommand.length-1,1);
-        }
-
-
-        //  We put InternalOutput There Because of Piping related reasons(added parameter) --> We no output then return ""
-        //  Have internal checks for empty parameters for each command
-        switch(CurrCommand[0]){
-                /*[X}*/case "mkdir": CurrCommand = mkdir(CurrCommand,InternalOutput); break;
-                /*[X}*/case "rmdir": CurrCommand = rmdir(CurrCommand,InternalOutput); break;
-                /*[X}*/case "rm": CurrCommand = rm(CurrCommand,InternalOutput); break;
-                /*[X}*/case "touch": CurrCommand = touch(CurrCommand,InternalOutput); break;
-                /*[X}*/case "clear": CurrCommand = clear(CurrCommand,InternalOutput); break;        
-                /*[X}*/case "cat": CurrCommand = cat(CurrCommand,InternalOutput); break;
-                /*[X}*/case "ls": CurrCommand = ls(CurrCommand,InternalOutput); break;
-                /*[X}*/case "echo": CurrCommand = echo(CurrCommand,InternalOutput,"OVERLOAD_4_REDIRECTION"); break;
-                /*[X}*/case "cd": CurrCommand = cd(CurrCommand,InternalOutput); break;
-                /*[X}*/case "cp": CurrCommand = cp(CurrCommand,InternalOutput); break;
-                /*[X}*/case "mv": CurrCommand = mv(CurrCommand,InternalOutput); break;
-                /*[X}*/case "pwd": CurrCommand = pwd(CurrCommand,InternalOutput); break;
-            default : return "UNSUPPORTED COMMAND";break; }
-
-        TestPath = CommandArray.substr(CommandArray.indexOf(">")+1,CommandArray.length);
-
-        while(TestPath[0] == " "){
-            TestPath = TestPath.substr(1,TestPath.length);
-        }
-      
-        while(TestPath[TestPath.length-1] == " "){
-            TestPath = TestPath.substr(0,TestPath.length-1);
-        }
-
-        TestPath = PathResolution(TestPath);
-
-        if(TestPath == "Error"){
-            return "Redirection Error";
-        }else if(TestPath[0] == "new directory/file"){
-            file_hashtable.set(TestPath[1]+" "+TestPath[2],"");
-            dir_hashtable.get(TestPath[2]).splice(dir_hashtable.get(TestPath[2]).indexOf("|")+1,0,TestPath[1]);
-        }else if(TestPath[0] != "old file"){
-            return "Redirection Error";
-        }
-
-        file_hashtable.set(TestPath[1]+" "+TestPath[2],"\n"+CurrCommand);
-
-        return "";
-        
-             
-    }else if(CommandArray.indexOf("<") != -1){
-
-        TestPath = CommandArray.substr(CommandArray.indexOf("<")+1,CommandArray.length);
-
-        while(TestPath[0] == " "){
-            TestPath = TestPath.substr(1,TestPath.length);
-        }
-
-        while(TestPath[TestPath.length-1] == " "){
-            TestPath = TestPath.substr(0,TestPath.length-1);
-        }
-
-        TestPath = PathResolution(TestPath);
-
-        if(TestPath == "Error" || TestPath[0] !="old file"){
-            return "Redirection Error";
-        }
-        
-        
-        var CurrCommand = CommandArray.substr(0,CommandArray.indexOf("<")).split(" ");
-        
-        CurrCommand[1] = file_hashtable.get(TestPath[1]+" "+TestPath[2]);
-       
-        while(CurrCommand[0] == ""){
-            CurrCommand.splice(0,1);
-        }
-
-        while(CurrCommand[CurrCommand.length-1] == " "){
-            CurrCommand.splice(CurrCommand.length-1,1);
-        }
-
-        
-   
-
-      
-
-        //  We put InternalOutput There Because of Piping related reasons(added parameter) --> We no output then return ""
-        //  Have internal checks for empty parameters for each command
-        switch(CurrCommand[0]){
-                /*[X}*/case "mkdir": CurrCommand = mkdir(CurrCommand,InternalOutput); break;
-                /*[X}*/case "rmdir": CurrCommand = rmdir(CurrCommand,InternalOutput); break;
-                /*[X}*/case "rm": CurrCommand = rm(CurrCommand,InternalOutput); break;
-                /*[X}*/case "touch": CurrCommand = touch(CurrCommand,InternalOutput); break;
-                /*[X}*/case "clear": CurrCommand = clear(CurrCommand,InternalOutput); break;        
-                /*[X}*/case "cat": CurrCommand = cat(CurrCommand,InternalOutput); break;
-                /*[X}*/case "ls": CurrCommand = ls(CurrCommand,InternalOutput); break;
-                /*[X}*/case "echo": CurrCommand = echo(CurrCommand,InternalOutput); break;
-                /*[X}*/case "cd": CurrCommand = cd(CurrCommand,InternalOutput); break;
-                /*[X}*/case "cp": CurrCommand = cp(CurrCommand,InternalOutput); break;
-                /*[X}*/case "mv": CurrCommand = mv(CurrCommand,InternalOutput); break;
-                /*[X}*/case "pwd": CurrCommand = pwd(CurrCommand,InternalOutput); break;
-            default : return "UNSUPPORTED COMMAND";break; }
-
-        
-
-        
-        return CurrCommand;
-        
-    }
-    
-    return "REDIRECTION ERROR - NO INTERNAL COMMAND"
+    //  Make sure to account for [ .. < (end of array)] -- > having only one thing to operate on  -- >start and end
+    //  Also errors with operator and command/statment mismatches in addition to path errors and command errors
+  
+    return DelimitFileOperators(CommandArray);
 }
 
 

@@ -120,7 +120,7 @@ function PathResolution(Path){
             return ["new directory/file",ResolvedPath[i],Internal_Directory];
             }else{
                 alert(".:ERROR IN PATH:.");
-                return "ERROR";
+                return "Error";
             }
         }else if(IsAInternalFile(Internal_Directory,ResolvedPath[i]) != -1 ){
             //  For commands like cat
@@ -130,12 +130,12 @@ function PathResolution(Path){
             }else{
                
                 alert(".:ERROR IN PATH:.");
-                return "ERROR";
+                return "Error";
             }
     
         }else{
             alert(".:ERROR IN PATH:.");
-            return "ERROR";
+            return "Error";
         }
               
 
@@ -163,6 +163,9 @@ function CommandResolution(CommandArray){
             //  For the redirections be aware there can be > < > inside
             
             InternalOutput = FileInOutAppend(CommandArray[i],InternalOutput);
+            
+         
+            
         }else{
             //  Command Resolution
             var CurrCommand = CommandArray[i].split(" ");
@@ -516,6 +519,7 @@ function mv(CurrCommand,InternalOutput){
     
 }
 
+//  For File redirection
 function echo(CurrCommand,InternalOutput, Overloaded){
     
     if( CurrCommand.length <2){
@@ -530,63 +534,66 @@ function echo(CurrCommand,InternalOutput, Overloaded){
 }
 
 
+function Listifiy(CommandArray){
+    CommandArray = CommandArray.replace("<<","焄");
+    var Result = [];
+    
+    var counter = 0
+    while(CommandArray.indexOf("<") != -1 || CommandArray.indexOf(">") != -1){
+        
+        if(CommandArray[counter] == "<" ){
+            Result.push(CommandArray.substr(0,counter).trim());
+            Result.push("<");
+            CommandArray = CommandArray.substr(counter+1,CommandArray.length);
+            counter=0;
+        }else if(CommandArray[counter] == "焄"){
+            Result.push(CommandArray.substr(0,counter).trim());
+            Result.push("<<");
+            CommandArray = CommandArray.substr(counter+1,CommandArray.length);
+            counter=0;
+        }else if(CommandArray[counter] == ">"){
+            Result.push(CommandArray.substr(0,counter).trim());
+            Result.push(">");
+            CommandArray = CommandArray.substr(counter+1,CommandArray.length);
+            counter=0;
+        }else{
+            counter++;
+        }
+        
+        
+    }
+    
+  
+    Result.push(CommandArray);
+    if(Result[Result.length-1] ==">" || Result[Result.length-1] =="<" || Result[Result.length-1] =="焄" || Result[Result.length-1] =="" ){
+        return "Redirection Error";
+    }
+
+    
+    return Result;
+}
+
+
 //======================================COMMANDS END===============================================================
 
 
 
 //======================================FILE MANIPULATION===========================================================
 
-function DelimitFileOperators(CommandArray){
-    
-    if( (CommandArray[0] == ">" && CommandArray[1] == ">") || (CommandArray[CommandArray.length-2] == ">" && CommandArray[CommandArray.length-1] == ">")){
-        return "ERROR in DelimitFileOperators"
-    }if((CommandArray[0] == ">") || (CommandArray[CommandArray.length-1] == ">")){
-        return "ERROR in DelimitFileOperators"
-    }if((CommandArray[0] == "<") || (CommandArray[CommandArray.length-1] == "<")){
-        return "ERROR in DelimitFileOperators"
-    }  
-    
-    
-    var Signs = [];
-    for(var i = 1; i < CommandArray.length-1; i++){
-        if(CommandArray[i] == ">" && CommandArray[i+1] == ">"){
-            Signs.push(">>");
-        }else if(CommandArray[i] == ">" && CommandArray[i-1] != ">" && CommandArray[i+1] != ">"){
-            Signs.push(">");
-        }else if(CommandArray[i] == "<"){
-            Signs.push("<");
-        }    
-    }
-
-    
-    
-    
-    
-    CommandArray = CommandArray.replace(/>>/g,";");
-    CommandArray = CommandArray.replace(/>/g,";");
-    CommandArray = CommandArray.replace(/</g,";");
-    
-    CommandArray = CommandArray.split(";");
-    for(var i = 0; i < CommandArray.length; i++){
-        CommandArray[i] = CommandArray[i].trim();    
-    }
-    
-    return [CommandArray,Signs];
-}
-
-
 
 function FileInOutAppend(CommandArray,InternalOutput){
-    //  Make sure to account for [ .. < (end of array)] -- > having only one thing to operate on  -- >start and end
-    //  Also errors with operator and command/statment mismatches in addition to path errors and command errors
-  
-    return DelimitFileOperators(CommandArray);
+    
+    
+    alert(Listifiy(CommandArray).toString());
+    
+    
+    
+    
+    
+    
+    
+    return "";
 }
-
-
-
-
-
 
 
 

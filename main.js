@@ -1,9 +1,9 @@
 // === CORE ==============================
 dir_hashtable = new Map();
-dir_hashtable.set("/root",["NULL","|"]);
+dir_hashtable.set("/root",["NULL","|","test"]);
 current_working_directory = "/root";
 file_hashtable = new Map();
-
+file_hashtable.set("test /root","! T E ST!")
 //=======================================
 /*
 
@@ -536,25 +536,25 @@ function echo(CurrCommand,InternalOutput, Overloaded){
 
 
 function Listifiy(CommandArray){
-    CommandArray = CommandArray.replace("<<","焄");
+    CommandArray = CommandArray.replace(">>","焄");
     var Result = [];
     
     var counter = 0
     while(CommandArray.indexOf("<") != -1 || CommandArray.indexOf(">") != -1 || CommandArray.indexOf("焄") != -1){
         
-        if(CommandArray[counter] == "<" ){
+        if(CommandArray[counter] == ">" ){
             Result.push(CommandArray.substr(0,counter).trim());
-            Result.push("<");
+            Result.push(">");
             CommandArray = CommandArray.substr(counter+1,CommandArray.length);
             counter=0;
         }else if(CommandArray[counter] == "焄"){
             Result.push(CommandArray.substr(0,counter).trim());
-            Result.push("<<");
+            Result.push(">>");
             CommandArray = CommandArray.substr(counter+1,CommandArray.length);
             counter=0;
-        }else if(CommandArray[counter] == ">"){
+        }else if(CommandArray[counter] == "<"){
             Result.push(CommandArray.substr(0,counter).trim());
-            Result.push(">");
+            Result.push("<");
             CommandArray = CommandArray.substr(counter+1,CommandArray.length);
             counter=0;
         }else{
@@ -591,14 +591,14 @@ function FileInOutAppend(CommandArray,GivenOutput){
     if(CommandArray == "Redirection Error"){
         return "Redirection Error";
     }
-    alert(CommandArray.toString());
+    
     for(var i=1;i<CommandArray.length-1;i++){
         
-        if (CommandArray[i] == "<<"){
+        if (CommandArray[i] == ">>"){
             
             CommandArray[i-1] = CommandArray[i-1].split(" ");
             
-            switch(CommandArray[i-1][0]){
+            switch(CommandArray[i-1][0].trim()){
                     /*[X}*/case "mkdir": CommandArray[i-1] = mkdir(CommandArray[i-1],InternalOutput); break;
                     /*[X}*/case "rmdir": CommandArray[i-1] = rmdir(CommandArray[i-1],InternalOutput); break;
                     /*[X}*/case "rm": CommandArray[i-1] = rm(CommandArray[i-1],InternalOutput); break;
@@ -626,6 +626,44 @@ function FileInOutAppend(CommandArray,GivenOutput){
                 return "Redirection Error";
             }
             
+            InternalOutput = "";
+        }else if (CommandArray[i] == ">"){
+
+            CommandArray[i-1] = CommandArray[i-1].split(" ");
+
+            switch(CommandArray[i-1][0].trim()){
+                    /*[X}*/case "mkdir": CommandArray[i-1] = mkdir(CommandArray[i-1],InternalOutput); break;
+                    /*[X}*/case "rmdir": CommandArray[i-1] = rmdir(CommandArray[i-1],InternalOutput); break;
+                    /*[X}*/case "rm": CommandArray[i-1] = rm(CommandArray[i-1],InternalOutput); break;
+                    /*[X}*/case "touch": CommandArray[i-1] = touch(CommandArray[i-1],InternalOutput); break;
+                    /*[X}*/case "clear": CommandArray[i-1] = clear(CommandArray[i-1],InternalOutput); break;        
+                    /*[X}*/case "cat": CommandArray[i-1] = cat(CommandArray[i-1],InternalOutput); break;
+                    /*[X}*/case "ls": CommandArray[i-1] = ls(CommandArray[i-1],InternalOutput); break;
+                    /*[X}*/case "echo": CommandArray[i-1] = echo(CommandArray[i-1],InternalOutput,"4 Redirection"); break;
+                    /*[X}*/case "cd": CommandArray[i-1] = cd(CommandArray[i-1],InternalOutput); break;
+                    /*[X}*/case "cp": CommandArray[i-1] = cp(CommandArray[i-1],InternalOutput); break;
+                    /*[X}*/case "mv": CommandArray[i-1] = mv(CommandArray[i-1],InternalOutput); break;
+                    /*[X}*/case "pwd": CommandArray[i-1] = pwd(CommandArray[i-1],InternalOutput); break;
+                default : return "Redirection Error";break; }
+
+            var FilePath = PathResolution(CommandArray[i+1].trim());
+          
+            if(FilePath[0] == "new directory/file"){
+
+                dir_hashtable.get(FilePath[2]).splice(dir_hashtable.get(FilePath[2]).indexOf("|")+1,0,FilePath[1]);
+                file_hashtable.set(FilePath[1]+" "+FilePath[2],CommandArray[i-1]);
+
+            }else if(FilePath[0] =="old file"){
+                file_hashtable.set(FilePath[1]+" "+FilePath[2],CommandArray[i-1]);
+            }else{
+                return "Redirection Error";
+            }
+
+            InternalOutput = "";
+        }else if(CommandArray[i] == "<"){
+            // 爨 
+
+        
             
         }
         
